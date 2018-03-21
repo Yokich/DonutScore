@@ -2,8 +2,10 @@ package com.welander.donutscore.viewmodels
 
 import android.databinding.BaseObservable
 import android.databinding.Bindable
+import com.welander.donutscore.R
 import com.welander.donutscore.models.CreditScoreInformation
 import com.welander.donutscore.network.CreditScoreStore
+import com.welander.donutscore.utils.safePercent
 import io.reactivex.SingleObserver
 import io.reactivex.disposables.Disposable
 import timber.log.Timber
@@ -15,37 +17,54 @@ import timber.log.Timber
 class ScoreActivityViewModel constructor(private val creditScoreStore: CreditScoreStore) : BaseObservable() {
 
     @Bindable
-    var minValue: Int = 0
-        get() = creditScoreInformation.minValue
+    var percentageValue: Int = 1 // Make sure minimum value for Pie is not 0, it disappears
+        get() = Math.max(1, creditScoreInformation.score safePercent creditScoreInformation.maxValue)
+
+    val maxValueTemplateString = R.string.label_pie_max_value
 
     @Bindable
-    var maxValue: Int = 0
-        get() = creditScoreInformation.maxValue
+    var maxValue: String = ""
+        get() = creditScoreInformation.maxValue.toString()
 
     @Bindable
-    var score: Int = 0
-        get() = creditScoreInformation.score
+    var scoreLabel = ""
+        get() = creditScoreInformation.score.toString()
 
-    var creditScoreInformation: CreditScoreInformation = CreditScoreInformation(0, 0, 0)
+    private var creditScoreInformation: CreditScoreInformation = CreditScoreInformation(0, 0, 0)
+
+    private fun showError(e: Throwable) {
+        // TODO
+        Timber.e("TODO - implement error handling")
+        Timber.e("Error: ${e.localizedMessage}")
+    }
+
+    private fun showLoading(show: Boolean) {
+        // TODO
+        Timber.w("TODO - Implement loading...")
+
+    }
+
+    private fun showResult(info: CreditScoreInformation) {
+        Timber.i("show result: $info")
+        creditScoreInformation = info
+        notifyChange()
+    }
 
     fun fetchCreditScore() {
         creditScoreStore.fetchCreditScoreInformation().subscribeWith(object : SingleObserver<CreditScoreInformation> {
             override fun onSuccess(successValue: CreditScoreInformation) {
-                Timber.i("success $successValue")
-                // Stop loading
-                creditScoreInformation = successValue
-                notifyChange()
-
+                showLoading(false)
+                showResult(successValue)
             }
 
             override fun onSubscribe(d: Disposable) {
-                // Start loading
+                Timber.i("Subscribed for credit score")
+                showLoading(true)
             }
 
             override fun onError(e: Throwable) {
-                Timber.e("Error: ${e.localizedMessage}")
-                // Stop loading
-                // Show error screen
+                showLoading(false)
+                showError(e)
             }
 
         })

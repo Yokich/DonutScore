@@ -18,13 +18,21 @@ class ScoreActivity : AppCompatActivity() {
     lateinit var viewModel: ScoreActivityViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setupDagger()
+        super.onCreate(savedInstanceState)
+        setupViewModel()
+    }
+
+    private fun setupDagger() {
         DonutScoreApplication
                 .creditScoreComponent(this)
                 .scoreActivity(this)
-        super.onCreate(savedInstanceState)
-        val binding = DataBindingUtil.setContentView<ActivityScoreBinding>(this, R.layout.activity_score)
+    }
 
+    private fun setupViewModel() {
         viewModel = ScoreActivityViewModel(store)
+
+        val binding = DataBindingUtil.setContentView<ActivityScoreBinding>(this, R.layout.activity_score)
         binding.viewModel = viewModel
     }
 

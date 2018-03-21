@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">MyCreditScore</string>
+    <string name="label_donut_description">Your credit score is</string>
+    <string name="label_pie_max_value">out of %1$s</string>
 </resources>
