@@ -2,10 +2,9 @@ package com.welander.donutscore.viewmodels
 
 import android.databinding.BaseObservable
 import android.databinding.Bindable
-import com.welander.donutscore.R
+import com.welander.donutscore.BR
 import com.welander.donutscore.models.CreditScoreInformation
 import com.welander.donutscore.network.CreditScoreStore
-import com.welander.donutscore.utils.safePercent
 import io.reactivex.Single
 import io.reactivex.SingleObserver
 import io.reactivex.disposables.Disposable
@@ -18,52 +17,17 @@ import java.util.concurrent.TimeUnit
 
 class ScoreActivityViewModel constructor(private val creditScoreStore: CreditScoreStore) : BaseObservable() {
 
-    val errorViewModel = ErrorViewModel()
-    val domutViewModel = DonutViewModel()
-
-    /*
-    var loading
-     |- DonutViewModel
-     |- ErrorViewModel
-     */
+    val errorViewModel = ErrorViewModel(this::fetchCreditScore)
+    val donutViewModel = DonutViewModel()
 
     @Bindable
-    var percentageValue: Int = 1 // Make sure minimum value for Pie is not 0, it disappears
-        get() = Math.max(1, creditScoreInformation.score safePercent creditScoreInformation.maxValue)
-
-    val maxValueTemplateString = R.string.label_pie_max_value
-
-    @Bindable
-    var maxValue: String = ""
-        get() = creditScoreInformation.maxValue.toString()
-
-    @Bindable
-    var scoreLabel = ""
-        get() = creditScoreInformation.score.toString()
-
-    private var creditScoreInformation: CreditScoreInformation = CreditScoreInformation(0, 0, 0)
-
-    private fun showError(e: Throwable) {
-        // TODO
-        Timber.e("TODO - implement error handling")
-        Timber.e("Error: ${e.localizedMessage}")
-    }
-
-    private fun showLoading(show: Boolean) {
-        // TODO
-        Timber.w("TODO - Implement loading...")
-
-    }
-
-    private fun showResult(info: CreditScoreInformation) {
-        Timber.i("show result: $info")
-        creditScoreInformation = info
-        notifyChange()
-    }
+    var showLoading = false
 
     fun fetchCreditScore() {
         // creditScoreStore.fetchCreditScoreInformation().subscribeWith(creditScoreObserver)
-        mockScore()
+//        mockScore()
+//        mockLoading()
+        mockError()
     }
 
     val creditScoreObserver = object : SingleObserver<CreditScoreInformation> {
@@ -74,6 +38,8 @@ class ScoreActivityViewModel constructor(private val creditScoreStore: CreditSco
 
         override fun onSubscribe(d: Disposable) {
             Timber.i("Subscribed for credit score")
+            donutViewModel.visible = false
+            errorViewModel.visible = false
             showLoading(true)
         }
 
@@ -81,7 +47,21 @@ class ScoreActivityViewModel constructor(private val creditScoreStore: CreditSco
             showLoading(false)
             showError(e)
         }
+    }
 
+    private fun showLoading(show: Boolean) {
+        showLoading = show
+        notifyPropertyChanged(BR.showLoading)
+    }
+
+    private fun showResult(info: CreditScoreInformation) {
+        donutViewModel.visible = true
+        donutViewModel.updateData(info)
+    }
+
+    private fun showError(e: Throwable) {
+        Timber.e("Error: ${e.localizedMessage}")
+        errorViewModel.visible = true
     }
 
     // Development methods
@@ -92,14 +72,20 @@ class ScoreActivityViewModel constructor(private val creditScoreStore: CreditSco
     }
 
     fun mockLoading() {
-        Single.just(CreditScoreInformation(567, 1000, 100))
-                .delay(1, TimeUnit.HOURS)
+        Single.just(CreditScoreInformation(300, 700, 0))
+                .delay(5, TimeUnit.SECONDS)
                 .subscribeWith(creditScoreObserver)
     }
 
     fun mockError() {
-        val errorSingle: Single<CreditScoreInformation> = Single.just(null)
-        errorSingle.subscribeWith(creditScoreObserver)
+        val errorSingle: Single<CreditScoreInformation> = Single.error(Throwable("BIG ERROR"))
+        // todo, add subscribeOn
+        // todo, add Observe on
+        // todo, handle exceptions
+        // todo, tests for these
+        errorSingle
+                .delay(500, TimeUnit.MILLISECONDS)
+                .subscribeWith(creditScoreObserver)
     }
 
 

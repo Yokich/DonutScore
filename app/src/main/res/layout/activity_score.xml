@@ -17,56 +17,45 @@
         android:background="@drawable/background_gradient"
         tools:context="com.welander.donutscore.activities.ScoreActivity">
 
-        <com.welander.donutscore.views.PieView
-            android:id="@+id/pie"
-            android:layout_width="180dp"
-            android:layout_height="180dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="60dp"
-            app:inner_pie_padding="20"
-            app:inner_text_visibility="false"
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="80dp"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            app:isVisible="@{viewModel.showLoading}"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:percentage="@{viewModel.percentageValue}"
-            app:percentage_size="20"
-            tools:percentage="50" />
+            tools:visibility="invisible">
 
-        <TextView
-            android:id="@+id/label_your_score_text"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Loading your credit score..." />
+
+            <ProgressBar
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginTop="24dp" />
+        </LinearLayout>
+
+        <include
+            layout="@layout/view_donut_component"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="50dp"
-            android:text="@string/label_donut_description"
-            android:textColor="@android:color/white"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="@id/pie" />
+            android:layout_marginTop="60dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:viewModel="@{viewModel.donutViewModel}" />
 
-        <TextView
-            android:id="@+id/label_score_value"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@{viewModel.scoreLabel}"
-            android:textColor="@color/percentageFillColor"
-            android:textSize="56sp"
-            android:translationY="-12dp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/label_your_score_text"
-            tools:text="357" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@android:color/white"
-            android:translationY="-20dp"
-            app:insertText="@{viewModel.maxValue}"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/label_score_value"
-            app:template="@{viewModel.maxValueTemplateString}"
-            tools:text="out of 700}" />
+        <include
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            layout="@layout/view_error_component"
+            app:viewModel="@{viewModel.errorViewModel}"
+            tools:visibility="invisible" />
 
     </android.support.constraint.ConstraintLayout>
 </layout>
