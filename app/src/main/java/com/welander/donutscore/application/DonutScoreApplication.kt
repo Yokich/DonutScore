@@ -7,8 +7,8 @@ import timber.log.Timber.DebugTree
 
 
 /**
- * Created by welander on 2018-03-17.
- */
+* Crafted by welander on 2018-03-17.
+*/
 class DonutScoreApplication : Application() {
 
     lateinit var creditScoreComponent: DonutScoreApplicationComponent

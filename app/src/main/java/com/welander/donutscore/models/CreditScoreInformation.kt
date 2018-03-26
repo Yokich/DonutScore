@@ -3,7 +3,7 @@ package com.welander.donutscore.models
 import com.google.gson.annotations.SerializedName
 
 /**
- * Created by welander on 2018-03-17.
+ * Crafted by welander on 2018-03-17.
  * For a larger application, consider separating DTO's and business logic models
  */
 data class CreditScoreInformation(

@@ -5,8 +5,8 @@ import io.reactivex.Single
 import retrofit2.http.GET
 
 /**
- * Created by welander on 2018-03-17.
- */
+* Crafted by welander on 2018-03-17.
+*/
 interface CreditScoreService {
 
     @GET("prod/mockcredit/values")

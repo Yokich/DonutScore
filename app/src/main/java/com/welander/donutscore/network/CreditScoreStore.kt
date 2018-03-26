@@ -7,12 +7,12 @@ import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
 /**
- * Created by welander on 2018-03-17.
- */
+* Crafted by welander on 2018-03-17.
+*/
 @DonutScoreScope
-class CreditScoreStore @Inject constructor (private val service: CreditScoreService) {
+class CreditScoreStore @Inject constructor(private val service: CreditScoreService) {
 
-     fun fetchCreditScoreInformation(): Single<CreditScoreInformation> {
+    fun fetchCreditScoreInformation(): Single<CreditScoreInformation> {
         return service.getCreditScore()
                 .subscribeOn(Schedulers.io())
                 .map { it.information }

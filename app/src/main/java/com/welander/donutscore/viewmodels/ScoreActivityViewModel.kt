@@ -5,14 +5,12 @@ import android.databinding.Bindable
 import com.welander.donutscore.BR
 import com.welander.donutscore.models.CreditScoreInformation
 import com.welander.donutscore.network.CreditScoreStore
-import io.reactivex.Single
 import io.reactivex.SingleObserver
 import io.reactivex.disposables.Disposable
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
 
 /**
- * Created by welander on 2018-03-17.
+ * Crafted by welander on 2018-03-17.
  */
 
 class ScoreActivityViewModel constructor(private val creditScoreStore: CreditScoreStore) : BaseObservable() {
@@ -22,32 +20,6 @@ class ScoreActivityViewModel constructor(private val creditScoreStore: CreditSco
 
     @Bindable
     var showLoading = false
-
-    fun fetchCreditScore() {
-        // creditScoreStore.fetchCreditScoreInformation().subscribeWith(creditScoreObserver)
-//        mockScore()
-//        mockLoading()
-        mockError()
-    }
-
-    val creditScoreObserver = object : SingleObserver<CreditScoreInformation> {
-        override fun onSuccess(successValue: CreditScoreInformation) {
-            showLoading(false)
-            showResult(successValue)
-        }
-
-        override fun onSubscribe(d: Disposable) {
-            Timber.i("Subscribed for credit score")
-            donutViewModel.visible = false
-            errorViewModel.visible = false
-            showLoading(true)
-        }
-
-        override fun onError(e: Throwable) {
-            showLoading(false)
-            showError(e)
-        }
-    }
 
     private fun showLoading(show: Boolean) {
         showLoading = show
@@ -59,34 +31,34 @@ class ScoreActivityViewModel constructor(private val creditScoreStore: CreditSco
         donutViewModel.updateData(info)
     }
 
-    private fun showError(e: Throwable) {
-        Timber.e("Error: ${e.localizedMessage}")
-        errorViewModel.visible = true
+    fun fetchCreditScore() {
+        creditScoreStore.fetchCreditScoreInformation().subscribeWith(creditScoreObserver)
     }
 
-    // Development methods
+    private val creditScoreObserver = object : SingleObserver<CreditScoreInformation> {
+        override fun onSuccess(successValue: CreditScoreInformation) {
+            Timber.i("Got Credit Score $successValue")
+            showLoading(false)
+            showResult(successValue)
+        }
 
-    fun mockScore() {
-        Single.just(CreditScoreInformation(300, 700, 0))
-                .subscribeWith(creditScoreObserver)
+        override fun onSubscribe(d: Disposable) {
+            Timber.i("Subscribed for credit score")
+            donutViewModel.visible = false
+            errorViewModel.visible = false
+            showLoading(true)
+        }
+
+        /**
+         * For this simple application we just handle the errors like this
+         * For a more advanced application we might introduce states in the
+         * reactive stream, and modify the values returned on error
+         */
+        override fun onError(e: Throwable) {
+            Timber.e("Error: ${e.localizedMessage}")
+            showLoading(false)
+            errorViewModel.visible = true
+        }
     }
-
-    fun mockLoading() {
-        Single.just(CreditScoreInformation(300, 700, 0))
-                .delay(5, TimeUnit.SECONDS)
-                .subscribeWith(creditScoreObserver)
-    }
-
-    fun mockError() {
-        val errorSingle: Single<CreditScoreInformation> = Single.error(Throwable("BIG ERROR"))
-        // todo, add subscribeOn
-        // todo, add Observe on
-        // todo, handle exceptions
-        // todo, tests for these
-        errorSingle
-                .delay(500, TimeUnit.MILLISECONDS)
-                .subscribeWith(creditScoreObserver)
-    }
-
 
 }

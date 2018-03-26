@@ -5,8 +5,8 @@ import com.welander.donutscore.network.ApiModule
 import dagger.Component
 
 /**
- * Created by welander on 2018-03-17.
- */
+* Crafted by welander on 2018-03-17.
+*/
 @DonutScoreScope
 @Component(modules = [ApiModule::class])
 interface DonutScoreApplicationComponent {

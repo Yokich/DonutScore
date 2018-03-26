@@ -8,7 +8,7 @@ import android.widget.TextView
 /**
  * Crafted by welander on 2018-03-21.
  */
-//
+
 @BindingAdapter(value = ["template", "insertText"], requireAll = true)
 fun insertTextIntoTemplate(view: TextView, @StringRes template: Int, insertText: String) {
     view.text = view.resources.getString(template, insertText)
